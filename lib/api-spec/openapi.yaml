@@ -3,20 +3,29 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: TON Season Telegram Mini App API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User operations
+  - name: wallet
+    description: Wallet operations
+  - name: transactions
+    description: Transaction operations
+  - name: tasks
+    description: Task operations
+  - name: referrals
+    description: Referral operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,225 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+
+  /users/register:
+    post:
+      operationId: registerUser
+      tags: [users]
+      summary: Register or login user via Telegram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserBody"
+      responses:
+        "200":
+          description: User registered or logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/settings:
+    patch:
+      operationId: updateSettings
+      tags: [users]
+      summary: Update user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /wallet/balance:
+    get:
+      operationId: getWalletBalance
+      tags: [wallet]
+      summary: Get wallet balance and asset list
+      responses:
+        "200":
+          description: Wallet balance info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletBalance"
+
+  /wallet/deposit-address:
+    get:
+      operationId: getDepositAddress
+      tags: [wallet]
+      summary: Get TON deposit address for current user
+      responses:
+        "200":
+          description: Deposit address
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepositAddress"
+
+  /wallet/send:
+    post:
+      operationId: sendTon
+      tags: [wallet]
+      summary: Send TON to address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendTonBody"
+      responses:
+        "200":
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Bad request
+
+  /wallet/swap:
+    post:
+      operationId: swapToken
+      tags: [wallet]
+      summary: Swap tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwapTokenBody"
+      responses:
+        "200":
+          description: Swap executed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SwapResult"
+        "400":
+          description: Bad request
+
+  /transactions:
+    get:
+      operationId: getTransactions
+      tags: [transactions]
+      summary: Get transaction history
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionList"
+
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      summary: Get all daily tasks
+      responses:
+        "200":
+          description: Task list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+
+  /tasks/{taskId}/complete:
+    post:
+      operationId: completeTask
+      tags: [tasks]
+      summary: Mark a task as completed
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "400":
+          description: Already completed or error
+
+  /referrals:
+    get:
+      operationId: getReferrals
+      tags: [referrals]
+      summary: Get referral list and link
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Referral info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralInfo"
+
+  /ton/price:
+    get:
+      operationId: getTonPrice
+      tags: [wallet]
+      summary: Get real-time TON price from Binance
+      responses:
+        "200":
+          description: TON price info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TonPrice"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +262,308 @@ components:
       required:
         - status
 
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        telegramId:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        referralCode:
+          type: string
+        referredBy:
+          type: ["string", "null"]
+        currency:
+          type: string
+          enum: [USD, RUB]
+        language:
+          type: string
+          enum: [en, ru]
+        joinedAt:
+          type: string
+        referralCount:
+          type: integer
+        walletAddress:
+          type: ["string", "null"]
+      required:
+        - id
+        - telegramId
+        - username
+        - referralCode
+        - currency
+        - language
+        - joinedAt
+        - referralCount
+
+    RegisterUserBody:
+      type: object
+      properties:
+        telegramId:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        referralCode:
+          type: ["string", "null"]
+      required:
+        - telegramId
+        - username
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        currency:
+          type: string
+          enum: [USD, RUB]
+        language:
+          type: string
+          enum: [en, ru]
+
+    WalletBalance:
+      type: object
+      properties:
+        totalUsd:
+          type: number
+        changePercent:
+          type: number
+        changeUsd:
+          type: number
+        address:
+          type: string
+        assets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Asset"
+      required:
+        - totalUsd
+        - changePercent
+        - changeUsd
+        - address
+        - assets
+
+    Asset:
+      type: object
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        balance:
+          type: number
+        priceUsd:
+          type: ["number", "null"]
+        valueUsd:
+          type: number
+        changePercent:
+          type: ["number", "null"]
+        iconUrl:
+          type: ["string", "null"]
+      required:
+        - symbol
+        - name
+        - balance
+        - valueUsd
+
+    DepositAddress:
+      type: object
+      properties:
+        address:
+          type: string
+        network:
+          type: string
+        memo:
+          type: ["string", "null"]
+      required:
+        - address
+        - network
+
+    SendTonBody:
+      type: object
+      properties:
+        toAddress:
+          type: string
+        amount:
+          type: number
+        memo:
+          type: ["string", "null"]
+      required:
+        - toAddress
+        - amount
+
+    SwapTokenBody:
+      type: object
+      properties:
+        fromSymbol:
+          type: string
+        toSymbol:
+          type: string
+        amount:
+          type: number
+      required:
+        - fromSymbol
+        - toSymbol
+        - amount
+
+    SwapResult:
+      type: object
+      properties:
+        fromSymbol:
+          type: string
+        toSymbol:
+          type: string
+        fromAmount:
+          type: number
+        toAmount:
+          type: number
+        rate:
+          type: number
+        txId:
+          type: string
+      required:
+        - fromSymbol
+        - toSymbol
+        - fromAmount
+        - toAmount
+        - rate
+        - txId
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [sent, received, swap]
+        amount:
+          type: number
+        symbol:
+          type: string
+        valueUsd:
+          type: number
+        toAddress:
+          type: ["string", "null"]
+        fromAddress:
+          type: ["string", "null"]
+        memo:
+          type: ["string", "null"]
+        date:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, failed]
+      required:
+        - id
+        - type
+        - amount
+        - symbol
+        - valueUsd
+        - date
+        - status
+
+    TransactionList:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        total:
+          type: integer
+        hasMore:
+          type: boolean
+      required:
+        - transactions
+        - total
+        - hasMore
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [checkin, telegram_channel, telegram_group, follow_x]
+        title:
+          type: string
+        description:
+          type: string
+        url:
+          type: ["string", "null"]
+        reward:
+          type: number
+        completed:
+          type: boolean
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - type
+        - title
+        - description
+        - reward
+        - completed
+
+    ReferralInfo:
+      type: object
+      properties:
+        referralLink:
+          type: string
+        referralCode:
+          type: string
+        totalReferrals:
+          type: integer
+        referrals:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReferralUser"
+        hasMore:
+          type: boolean
+      required:
+        - referralLink
+        - referralCode
+        - totalReferrals
+        - referrals
+        - hasMore
+
+    ReferralUser:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: ["string", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        joinedAt:
+          type: string
+      required:
+        - id
+        - username
+        - joinedAt
+
+    TonPrice:
+      type: object
+      properties:
+        priceUsd:
+          type: number
+        changePercent:
+          type: number
+        volume:
+          type: number
+      required:
+        - priceUsd
+        - changePercent
+        - volume
