@@ -72,26 +72,28 @@ export default function WalletPage() {
       {/* Balance Card */}
       <div className="px-3 mb-4">
         <motion.div
-          className="ton-card p-5 text-white"
+          className="ton-card px-6 pt-8 pb-7 text-white"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
+          <div className="text-white/70 text-sm font-medium mb-2 tracking-wide uppercase">Total Balance</div>
+
           {balanceLoading ? (
-            <div className="shimmer h-10 w-36 rounded-lg mb-2" />
+            <div className="shimmer h-14 w-48 rounded-xl mb-3" />
           ) : (
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold">
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-6xl font-extrabold tracking-tight leading-none">
                 {formatUsd(balance?.totalUsd ?? 0, 2)}
               </span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="opacity-70 mb-1">
-                <path d="M12 4l8 8-8 8M4 12h16" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" className="opacity-60 mb-1 shrink-0">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </svg>
             </div>
           )}
 
-          <div className="flex items-center gap-2 mt-1 mb-4">
-            <span className="text-sm bg-white/20 rounded-full px-3 py-0.5 flex items-center gap-1">
+          <div className="flex items-center gap-2 mt-3 mb-6">
+            <span className="text-sm bg-white/20 rounded-full px-3 py-1 flex items-center gap-1 font-medium">
               {formatPercent(balance?.changePercent ?? 0)} · {formatUsd(balance?.changeUsd ?? 0)}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6" />
@@ -101,18 +103,18 @@ export default function WalletPage() {
 
           <button
             onClick={handleCopyAddress}
-            className="flex items-center gap-2 text-white/90 text-sm"
+            className="flex items-center gap-2 text-white/80 text-sm"
           >
-            <TonBadge size={18} />
-            <span className="font-mono">
+            <TonBadge size={20} />
+            <span className="font-mono text-sm">
               {balance?.address ? shortenAddress(balance.address, 6, 6) : "Loading..."}
             </span>
-            <span className="text-white/60 text-xs">⇄</span>
+            <span className="text-white/50 text-xs ml-1">⇄</span>
             {addressCopied && (
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-xs text-green-300"
+                className="text-xs text-green-300 ml-1"
               >
                 Copied!
               </motion.span>
