@@ -11,7 +11,8 @@ export default function ReferralPage() {
   const [allReferrals, setAllReferrals] = useState<any[]>([]);
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const { data, isLoading } = useGetReferrals({ limit: 10, offset });
+  const enabled = !!user?.telegramId;
+  const { data, isLoading } = useGetReferrals({ limit: 10, offset }, { query: { enabled } });
 
   useEffect(() => {
     if (data?.referrals) {

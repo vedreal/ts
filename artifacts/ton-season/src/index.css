@@ -67,8 +67,7 @@ body {
   @apply font-sans antialiased bg-background text-foreground;
   overscroll-behavior: none;
   user-select: none;
-  max-width: 480px;
-  margin: 0 auto;
+  width: 100%;
   min-height: 100dvh;
   background-color: hsl(var(--background));
 }

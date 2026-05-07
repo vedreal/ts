@@ -7,7 +7,9 @@ import { getGetTasksQueryKey } from "@workspace/api-client-react";
 import type { Task } from "@workspace/api-client-react";
 
 export default function TasksPage() {
-  const { data: tasks, isLoading } = useGetTasks();
+  const { user } = useApp();
+  const enabled = !!user?.telegramId;
+  const { data: tasks, isLoading } = useGetTasks({ query: { enabled } });
   const completeTask = useCompleteTask();
   const queryClient = useQueryClient();
   const [completing, setCompleting] = useState<string | null>(null);

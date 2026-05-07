@@ -18,9 +18,10 @@ export default function WalletPage() {
   const [allTxs, setAllTxs] = useState<any[]>([]);
   const [addressCopied, setAddressCopied] = useState(false);
 
-  const { data: balance, isLoading: balanceLoading } = useGetWalletBalance();
+  const enabled = !!user?.telegramId;
+  const { data: balance, isLoading: balanceLoading } = useGetWalletBalance({ query: { enabled } });
   const { data: tonPrice } = useGetTonPrice();
-  const { data: txData, isLoading: txLoading } = useGetTransactions({ limit: 5, offset: txOffset });
+  const { data: txData, isLoading: txLoading } = useGetTransactions({ limit: 5, offset: txOffset }, { query: { enabled } });
 
   useEffect(() => {
     if (txData?.transactions) {
@@ -69,9 +70,9 @@ export default function WalletPage() {
       </div>
 
       {/* Balance Card */}
-      <div className="px-4 mb-4">
+      <div className="px-3 mb-4">
         <motion.div
-          className="ton-card p-6 text-white"
+          className="ton-card p-5 text-white"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
@@ -121,8 +122,8 @@ export default function WalletPage() {
       </div>
 
       {/* Action Buttons */}
-      <div className="px-8 mb-6">
-        <div className="flex items-center justify-around">
+      <div className="px-4 mb-6">
+        <div className="flex items-center justify-around max-w-xs mx-auto">
           {[
             {
               id: "deposit",
@@ -173,7 +174,7 @@ export default function WalletPage() {
       </div>
 
       {/* Assets Section */}
-      <div className="px-4 mb-4">
+      <div className="px-3 mb-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Tab */}
           <div className="flex items-center gap-4 px-4 pt-4 pb-3 border-b border-gray-100">
@@ -229,7 +230,7 @@ export default function WalletPage() {
       </div>
 
       {/* Transactions Section */}
-      <div className="px-4">
+      <div className="px-3">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {txLoading && txOffset === 0 ? (
             <div className="p-4 space-y-4">

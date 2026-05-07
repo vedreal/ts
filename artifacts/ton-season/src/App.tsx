@@ -91,7 +91,7 @@ function AppContent() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 max-w-[480px] mx-auto relative">
+    <div className="flex flex-col min-h-screen bg-gray-50 w-full relative">
       <div className="flex-1 overflow-y-auto hide-scrollbar relative" style={{ paddingBottom: "60px" }}>
         <AnimatePresence mode="wait">
           <motion.div
