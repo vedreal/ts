@@ -92,7 +92,7 @@ function AppContent() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 w-full relative">
-      <div className="flex-1 overflow-y-auto hide-scrollbar relative" style={{ paddingBottom: "60px" }}>
+      <div className="flex-1 overflow-y-auto hide-scrollbar relative" style={{ paddingBottom: "100px" }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
